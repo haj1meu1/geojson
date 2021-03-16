@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>人口密度を視覚化</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css' rel='stylesheet' />
+<style>
+      body { margin:0; padding:0; }
+      #map { position:absolute; top:0; bottom:0; width:100%; }
+      .legend {
+        background-color: #fff;
+        border-radius: 3px;
+        bottom: 30px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.10);
+        font: 15px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+        padding: 10px;
+        position: absolute;
+        right: 10px;
+        z-index: 1;
+        line-height: 25px;
+        height: 280px;
+      }
+      .legend h4 {
+        margin: 0 0 10px;
+      }
+      .legend div span {
+        border-radius: 50%;
+        display: inline-block;
+        height: 15px;
+        margin-right: 10px;
+        width: 15px;
+        color:orangered
+      }
+</style>
+</head>
+<body>
+<div id="tooltip"></div>
+<div id="map"></div>
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1IjoiaGFqaW1ldWkiLCJhIjoiY2tsdWtjMXMyMGgyODJvbzR4ZXZxZTZrOCJ9.hQFOyVuJu-YlcGvMZMO9Rw';
+    var map = new mapboxgl.Map({
+        container: 'map', // container id
+	style: 'mapbox://styles/hajimeui/cklukru0105lm17l7no06exze',    // カスタムスタイル
+        center: [139.8329099, 35.6637169], // starting position [lng, lat]
+        zoom: 7 // starting zoom
+    });
+
+
+	// 2050年の人口から10段階のカテゴリ別に分類するためのフィルタ
+	let PT0_2050_1 = ["<", ["get", "PT0_2050"], 4000];
+	let PT0_2050_2 = ["all", [">=", ["get", "PT0_2050"], 4000], ["<", ["get", "PT0_2050"], 8000]];
+	let PT0_2050_3 = ["all", [">=", ["get", "PT0_2050"], 8000], ["<", ["get", "PT0_2050"], 12000]];
+	let PT0_2050_4 = ["all", [">=", ["get", "PT0_2050"], 12000], ["<", ["get", "PT0_2050"], 16000]];
+	let PT0_2050_5 = ["all", [">=", ["get", "PT0_2050"], 16000], ["<", ["get", "PT0_2050"], 20000]];
+	let PT0_2050_6 = ["all", [">=", ["get", "PT0_2050"], 20000], ["<", ["get", "PT0_2050"], 24000]];
+	let PT0_2050_7 = ["all", [">=", ["get", "PT0_2050"], 24000], ["<", ["get", "PT0_2050"], 28000]];
+	let PT0_2050_8 = ["all", [">=", ["get", "PT0_2050"], 28000], ["<", ["get", "PT0_2050"], 32000]];
+	let PT0_2050_9 = ["all", [">=", ["get", "PT0_2050"], 32000], ["<", ["get", "PT0_2050"], 36000]];
+	let PT0_2050_10 = ["all", [">=", ["get", "PT0_2050"], 36000], ["<", ["get", "PT0_2050"], 40000]];
+
+	// 色の設定
+	let colors = ['rgb(215, 25, 28)',   'rgb(232, 91, 58)',
+	              'rgb(249, 158, 89)',  'rgb(254, 201, 128)',
+	              'rgb(255, 237, 170)', 'rgb(237, 247, 201)',
+	              'rgb(199, 230, 219)', 'rgb(157, 207, 228)',
+	              'rgb(100, 165, 205)', 'rgb(44, 123, 182)'];
+
+
+    map.on('load', function() {
+        map.addLayer({
+            'id': 'rwanda-provinces',
+            'type': 'fill',
+            'source': {
+                'type': 'geojson',
+                'data':
+                    'https://github.com/haj1meu1/geojson/blob/950462ff0d299088b97225295de7269ae945dd72/N06-19_Joint.geojson'
+            },
+            'layout': {},
+            'paint': {
+                'fill-color':
+			["case",
+				PT0_2050_1, colors[0],
+				PT0_2050_2, colors[1],
+				PT0_2050_3, colors[2],
+				PT0_2050_4, colors[3],
+				PT0_2050_5, colors[4],
+				PT0_2050_6, colors[5],
+				PT0_2050_7, colors[6],
+				PT0_2050_8, colors[7],
+				PT0_2050_9, colors[8],
+				PT0_2050_10, colors[9],
+				colors[9]
+				],
+			"fill-outline-color": "gray",
+			'fill-opacity': 0.7
+	            }
+        });
+    });
+
+//console.log(map.getCanvas().toDataURL());
+
+</script>
+
+  <div id='county-legend' class='legend'>
+    <h4>1kmメッシュ別将来推計人口 2050年<br>（H30 国政局推計）</h4>
+      <div><span style='background-color: rgb(215, 25, 28)'></span>0 - 4,000</div>
+      <div><span style='background-color: rgb(232, 91, 58)'></span>4,000 - 8,000</div>
+      <div><span style='background-color: rgb(249, 158, 89)'></span>8,000 - 12,000</div>
+      <div><span style='background-color: rgb(254, 201, 128)'></span>12,000 - 16,000</div>
+      <div><span style='background-color: rgb(255, 237, 170)'></span>16,000 - 20,000</div>
+      <div><span style='background-color: rgb(237, 247, 201)'></span>20,000 - 24,000</div>
+      <div><span style='background-color: rgb(199, 230, 219)'></span>24,000 - 28,000</div>
+      <div><span style='background-color: rgb(157, 207, 228)'></span>28,000 - 32,000</div>
+      <div><span style='background-color: rgb(100, 165, 205)'></span>32,000 - 36,000</div>
+      <div><span style='background-color: rgb(44, 123, 182)'></span>36,000 - 40,000</div>
+　</div>
+
+</body>
+</html>
